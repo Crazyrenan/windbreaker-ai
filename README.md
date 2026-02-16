@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://i.pinimg.com/1200x/0f/bd/53/0fbd53c826baa95aae48b5fa97dd8ece.jpg" alt="WINDBREAKER Header" width="100%"/>
+  <img src="https://i.pinimg.com/1200x/77/9a/ba/779aba580c41a109eebf4507f7d42ec9.jpg" alt="WINDBREAKER Header" width="100%"/>
 </p>
 
 <h1 align="center">✈️ WINDBREAKER.Ai</h1>
@@ -133,3 +133,4 @@ WINDBREAKER.Ai/
 <p align="center">
 <i>Dikembangkan dengan fokus pada integritas data, skalabilitas sistem, dan pengalaman pengguna yang optimal.</i>
 </p>
+
