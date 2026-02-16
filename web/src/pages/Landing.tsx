@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ArrowRight, CheckCircle2, Zap, Globe, ShieldCheck } from 'lucide-react';
@@ -33,7 +33,7 @@ const Landing = () => {
       {/* --- NAVBAR --- */}
       <nav className="fixed top-0 w-full p-6 flex justify-between items-center z-50 backdrop-blur-sm bg-slate-900/30 border-b border-white/5">
         <div className="text-xl font-black italic tracking-tighter">
-          SKY-CAST<span className="text-blue-500">.AI</span>
+          WINDBREAKER<span className="text-blue-500">.AI</span>
         </div>
         <div className="flex gap-4 text-sm font-bold">
           <Link to="/login" className="px-4 py-2 hover:text-blue-400 transition-colors">LOGIN</Link>
@@ -46,15 +46,16 @@ const Landing = () => {
       {/* --- HERO SECTION --- */}
       <section className="relative min-h-screen flex flex-col items-center justify-center text-center px-4 pt-20">
         
-        {/* Background Gradients */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/20 blur-[120px] rounded-full -z-10 animate-pulse"></div>
+        {/* Background Gradients (Updated to v4 syntax: size-150) */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 bg-blue-600/20 blur-[120px] rounded-full -z-10 animate-pulse"></div>
 
         <div ref={heroRef} className="max-w-5xl mx-auto space-y-6">
           <p className="text-blue-500 font-mono text-xs md:text-sm tracking-[0.3em] uppercase mb-4">
             Next Gen Flight Analytics
           </p>
           
-          <h1 className="text-6xl md:text-9xl font-black tracking-tighter leading-[0.9] text-transparent bg-clip-text bg-gradient-to-b from-white via-slate-200 to-slate-600">
+          {/* Updated: bg-linear-to-b */}
+          <h1 className="text-6xl md:text-9xl font-black tracking-tighter leading-[0.9] text-transparent bg-clip-text bg-linear-to-b from-white via-slate-200 to-slate-600">
             PREDICT <br/>
             THE FUTURE.
           </h1>
@@ -107,8 +108,8 @@ const Landing = () => {
         </div>
 
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Free Plan */}
-          <div className="p-10 rounded-[2rem] border border-slate-800 bg-slate-900/40 backdrop-blur-sm hover:border-slate-700 transition-all">
+          {/* Free Plan - Updated: rounded-4xl */}
+          <div className="p-10 rounded-4xl border border-slate-800 bg-slate-900/40 backdrop-blur-sm hover:border-slate-700 transition-all">
             <h3 className="text-2xl font-bold mb-2">Starter</h3>
             <div className="text-4xl font-black mb-6">$0 <span className="text-lg font-normal text-slate-500">/mo</span></div>
             <ul className="space-y-4 mb-10 text-left text-slate-300">
@@ -121,9 +122,10 @@ const Landing = () => {
             </Link>
           </div>
 
-          {/* Pro Plan */}
-          <div className="relative p-10 rounded-[2rem] border border-blue-500/50 bg-blue-900/10 backdrop-blur-sm">
-            <div className="absolute top-0 right-0 bg-blue-600 text-xs font-black px-4 py-2 rounded-bl-xl rounded-tr-[2rem]">POPULAR</div>
+          {/* Pro Plan - Updated: rounded-4xl */}
+          <div className="relative p-10 rounded-4xl border border-blue-500/50 bg-blue-900/10 backdrop-blur-sm">
+            {/* Updated: rounded-tr-4xl */}
+            <div className="absolute top-0 right-0 bg-blue-600 text-xs font-black px-4 py-2 rounded-bl-xl rounded-tr-4xl">POPULAR</div>
             <h3 className="text-2xl font-bold mb-2 text-white">Pro Traveler</h3>
             <div className="text-4xl font-black mb-6">$12 <span className="text-lg font-normal text-slate-500">/mo</span></div>
             <ul className="space-y-4 mb-10 text-left text-slate-200">
@@ -139,7 +141,7 @@ const Landing = () => {
       </section>
 
       <footer className="py-10 text-center text-slate-600 text-sm font-mono border-t border-white/5 mt-20">
-        © 2026 SKY-CAST.AI INC. ALL RIGHTS RESERVED.
+        © 2026 WINDBREAKER.AI INC. ALL RIGHTS RESERVED.
       </footer>
     </div>
   );

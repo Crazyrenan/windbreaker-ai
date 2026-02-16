@@ -5,7 +5,7 @@
 }
 
 html, body {
-  /* Cleaner, professional dark mode (less pitch black, more deep blue) */
+  /* Ini warna dasar biru tua yang keren, bukan hitam pekat */
   background-color: #0f172a; 
   background-image: 
     radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
@@ -14,5 +14,5 @@ html, body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  font-family: 'Inter', system-ui, sans-serif; /* Adds a cleaner font */
+  font-family: 'Inter', system-ui, sans-serif;
 }
