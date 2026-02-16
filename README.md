@@ -70,8 +70,11 @@ Portfolio:
 <p align="center">
 <i>Dikembangkan dengan fokus pada integritas data dan pengalaman pengguna yang luar biasa.</i>
 </p>
+# Instal dependensi yang diperlukan
+pip install pandas scikit-learn xgboost fastapi uvicorn joblib
 
 # Jalankan server API
-python api.py****
+python api.py
 
 ```bash
+
