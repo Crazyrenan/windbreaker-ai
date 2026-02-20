@@ -11,7 +11,12 @@ import {
 } from 'lucide-react';
 
 const Login = () => {
+  // State untuk form & API
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  
   const formRef = useRef(null);
   const visualRef = useRef(null);
   const navigate = useNavigate();
@@ -38,19 +43,45 @@ const Login = () => {
     return () => ctx.revert();
   }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
-    // Simulasi Login (Nanti kita sambungkan ke FastAPI)
-    setTimeout(() => {
+    setError('');
+
+    try {
+      // FastAPI OAuth2 requires form data
+      const formData = new URLSearchParams();
+      formData.append('username', email); // Walaupun email, FastAPI membacanya sebagai 'username'
+      formData.append('password', password);
+
+      const response = await fetch("http://localhost:8000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: formData.toString(),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Simpan token ke localStorage
+        localStorage.setItem("user_token", data.access_token);
+        localStorage.setItem("user_name", data.user_name);
+        // Arahkan ke dashboard
+        navigate('/dashboard');
+      } else {
+        setError(data.detail || "Autentikasi gagal.");
+      }
+    } catch (err) {
+      setError("Gagal terhubung ke server backend.");
+    } finally {
       setLoading(false);
-      navigate('/dashboard'); 
-    }, 2000);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-[#0f172a] text-slate-100 font-sans grid grid-cols-1 lg:grid-cols-2 overflow-hidden">
+    <div className="min-h-screen bg-[#0f172a] text-slate-100 font-sans grid grid-cols-1 lg:grid-cols-2 overflow-hidden selection:bg-blue-500 selection:text-white">
       
       {/* --- LEFT SIDE: VISUAL (The View from 30,000ft) --- */}
       <div ref={visualRef} className="relative hidden lg:flex flex-col justify-between p-12 bg-slate-900 overflow-hidden">
@@ -95,6 +126,13 @@ const Login = () => {
             <p className="text-slate-500">Enter your credentials to access the neural network.</p>
           </div>
 
+          {/* Menampilkan pesan error dari Backend */}
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/50 text-red-500 text-[10px] font-bold uppercase tracking-widest p-4 rounded-xl">
+              ERROR: {error}
+            </div>
+          )}
+
           <form onSubmit={handleLogin} className="space-y-6">
             
             {/* Email Input */}
@@ -105,6 +143,8 @@ const Login = () => {
                 <input 
                   type="email" 
                   required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="pilot@windbreaker.ai"
                   className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 pl-12 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all font-medium placeholder-slate-700"
                 />
@@ -115,13 +155,15 @@ const Login = () => {
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Password</label>
-                <a href="#" className="text-[10px] font-bold text-blue-500 hover:text-blue-400">LOST ACCESS?</a>
+                <Link to="/forgot-password" className="text-[10px] font-bold text-blue-500 hover:text-blue-400 transition-colors">LOST ACCESS?</Link>
               </div>
               <div className="relative group">
                 <Lock className="absolute left-4 top-4 w-5 h-5 text-slate-600 group-focus-within:text-blue-500 transition-colors" />
                 <input 
                   type="password" 
                   required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
                   className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 pl-12 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all font-medium placeholder-slate-700"
                 />
@@ -144,13 +186,13 @@ const Login = () => {
             <div className="relative flex justify-center text-xs uppercase"><span className="bg-[#0f172a] px-4 text-slate-600 font-bold tracking-widest">Or access via</span></div>
           </div>
 
-          <button className="w-full bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-3 text-sm">
+          <button className="w-full bg-slate-900 border border-slate-800 hover:bg-slate-800 active:scale-[0.98] text-slate-300 font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-3 text-sm">
             <Fingerprint size={18} className="text-slate-500" />
             Biometric / SSO Passkey
           </button>
 
           <p className="text-center text-slate-600 text-sm">
-            New to the system? <Link to="/" className="text-blue-500 font-bold hover:text-blue-400">Request Clearance</Link>
+            New to the system? <Link to="/register" className="text-blue-500 font-bold hover:text-blue-400 transition-colors">Request Clearance</Link>
           </p>
         </div>
       </div>

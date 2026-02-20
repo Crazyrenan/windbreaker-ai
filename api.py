@@ -1,7 +1,9 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from auth import router as auth_router
 from pydantic import BaseModel
 import joblib
+from auth import get_current_user
 import os
 import pandas as pd
 import numpy as np
@@ -27,6 +29,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth_router)
+
 # 2. LOAD MODELS
 MODEL_PATH = os.path.join('models', 'xgb_flight_delay.pkl')
 ENCODER_PATH = os.path.join('models', 'encoders.pkl')
@@ -37,15 +41,15 @@ encoders = joblib.load(ENCODER_PATH)
 
 # 3. SCHEMA
 class FlightInput(BaseModel):
-    airline: str      # e.g. "DL"
-    origin: str       # e.g. "Atlanta, GA"
-    destination: str  # e.g. "Los Angeles, CA"
-    date: str         # "YYYY-MM-DD"
-    time: str         # "HH:MM"
+    airline: str      
+    origin: str       
+    destination: str  
+    date: str         
+    time: str         
 
 # 4. ENDPOINTS
 @app.post("/predict")
-def predict_delay(input: FlightInput):
+async def predict_delay(req: FlightInput, current_user: dict = Depends(get_current_user)):
     try:
         # A. Preprocessing Date/Time
         dt = pd.to_datetime(input.date)
@@ -90,22 +94,26 @@ def predict_delay(input: FlightInput):
     )
 
 @app.post("/api/predict-price")
-async def predict_price(req: PricePredictionRequest):
+async def predict_price(req: PricePredictionRequest, current_user: dict = Depends(get_current_user)):
     try:
         data = {
-            'airline': req.airline,
-            'origin': req.origin,
-            'destination': req.destination,
-            'duration_mins': req.duration_mins
+            'airline': str(req.airline),
+            'destination': str(req.destination),
+            'duration_mins': float(req.duration_mins)
         }
         df = pd.DataFrame([data])
 
-        for col in ['airline', 'origin', 'destination']:
-            le = price_encoders.get(col)
+        for col in ['airline', 'destination']:
+            le = encoders.get(col) 
             if le:
-                df[col] = df[col].apply(lambda x: np.where(le.classes_ == x)[0][0] if x in le.classes_ else 0)
+                df[col] = df[col].apply(lambda x: le.transform([x])[0] if x in le.classes_ else 0)
+                df[col] = pd.to_numeric(df[col])
+            else:
+                df[col] = 0
 
-        prediction = price_model.predict(df)
+        df = df[['airline', 'destination', 'duration_mins']]
+
+        prediction = model.predict(df)
         
         return {
             "status": "success",
@@ -113,7 +121,8 @@ async def predict_price(req: PricePredictionRequest):
         }
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Prediction Error: {e}") 
+        raise HTTPException(status_code=500, detail=f"Model Error: {str(e)}")
     
 @app.get("/options")
 def get_options():

@@ -1,172 +1,182 @@
-import { useState, useRef, useEffect } from 'react';
-import axios from 'axios';
+import { useEffect, useRef } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { gsap } from 'gsap';
-
 import { 
-  Navigation, Loader2, PlaneTakeoff, Search 
+  Plane, LayoutDashboard, Activity, LineChart, 
+  Settings, LogOut, User, ShieldCheck, Zap, Server
 } from 'lucide-react';
 
 const Dashboard = () => {
-  const [formData, setFormData] = useState({
-    airline: '',       
-    origin: '',
-    destination: '',
-    date: '2026-05-20',
-    time: '14:00'
-  });
+  const navigate = useNavigate();
+  const location = useLocation();
+  const userName = localStorage.getItem("user_name") || "Captain";
   
-  const [options, setOptions] = useState<{airlines: string[], cities: string[]}>({ airlines: [], cities: [] });
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<{prediction: string, probability: number, risk_score: number} | null>(null);
-  
-  const cardRef = useRef(null);
-  const formRef = useRef(null);
-  const headerRef = useRef(null);
+  const contentRef = useRef(null);
 
   useEffect(() => {
-    const fetchOptions = async () => {
-      try {
-        const res = await axios.get('http://127.0.0.1:8000/options');
-        setOptions(res.data);
-        if (res.data.airlines.length > 0) {
-          setFormData(prev => ({ ...prev, airline: res.data.airlines[0] }));
-        }
-      } catch (err) {
-        console.error("Gagal memuat opsi:", err);
-      }
-    };
-    fetchOptions();
-
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline();
-      tl.from(headerRef.current, { y: -50, opacity: 0, duration: 0.8, ease: "power3.out" })
-        .from(formRef.current, { x: -30, opacity: 0, duration: 0.6 }, "-=0.4");
-    });
+      gsap.from(".animate-card", {
+        y: 30,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.1,
+        ease: "power3.out"
+      });
+    }, contentRef);
     return () => ctx.revert();
   }, []);
 
-  useEffect(() => {
-    if (result && cardRef.current) {
-      gsap.fromTo(cardRef.current, 
-        { scale: 0.9, opacity: 0 }, 
-        { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.7)" }
-      );
-    }
-  }, [result]);
-
-  const handlePredict = async () => {
-    setLoading(true);
-    setResult(null);
-    try {
-      const response = await axios.post('http://127.0.0.1:8000/predict', formData);
-      setResult(response.data);
-    } catch (error) {
-      alert("Error: Pastikan backend FastAPI sudah berjalan!");
-    } finally {
-      setLoading(false);
-    }
+  const handleLogout = () => {
+    localStorage.removeItem("user_token");
+    localStorage.removeItem("user_name");
+    navigate("/login");
   };
 
   return (
-    <div className="min-h-screen text-slate-100 flex items-center justify-center p-4 md:p-8 font-sans overflow-x-hidden">
-      <div className="max-w-6xl w-full grid grid-cols-12 gap-6">
-        
-        <header ref={headerRef} className="col-span-12 mb-4 flex justify-between items-center border-b border-slate-800 pb-6">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <PlaneTakeoff className="text-blue-500 w-6 h-6" />
-              <span className="text-blue-500 font-black tracking-widest text-xs">V.2.1.0</span>
+    <div className="flex h-screen bg-[#0f172a] text-slate-100 font-sans overflow-hidden selection:bg-blue-500 selection:text-white">
+      
+      {/* SIDEBAR NAVIGATION */}
+      <aside className="w-64 bg-slate-900/50 border-r border-slate-800 flex flex-col justify-between backdrop-blur-xl relative z-20">
+        <div>
+          <div className="h-20 flex items-center px-8 border-b border-slate-800">
+            <div className="text-xl font-black italic tracking-tighter flex items-center gap-2">
+              WINDBREAKER<span className="text-blue-500">.AI</span>
             </div>
-            {/* PERBAIKAN: Menghapus tracking-tight, hanya menggunakan tracking-tighter */}
-            <h1 className="text-4xl font-black text-white italic tracking-tighter">WINDBREAKER<span className="text-blue-600">.AI</span></h1>
           </div>
-          <div className="hidden md:block text-right">
-            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.3em]">Neural Network Flight Analysis</p>
-            <p className="text-slate-300 text-xs font-mono">STATUS: OPERATIONAL</p>
+
+          <nav className="p-4 space-y-2 mt-4">
+            <p className="px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-4">Core Modules</p>
+            
+            <Link to="/dashboard" className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm ${location.pathname === '/dashboard' ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'}`}>
+              <LayoutDashboard size={18} /> Overview Hub
+            </Link>
+            
+            <Link to="/delay-predictor" className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm ${location.pathname === '/delay-predictor' ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'}`}>
+              <Activity size={18} /> Delay Predictor
+            </Link>
+
+            <Link to="/oracle" className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm ${location.pathname === '/oracle' ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'}`}>
+              <LineChart size={18} /> Price Oracle
+            </Link>
+          </nav>
+
+          <nav className="p-4 space-y-2 mt-4">
+            <p className="px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-4">System</p>
+            <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 text-left">
+              <Settings size={18} /> Configurations
+            </button>
+          </nav>
+        </div>
+
+        <div className="p-4 border-t border-slate-800">
+          <button 
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300"
+          >
+            <LogOut size={18} /> Terminate Session
+          </button>
+        </div>
+      </aside>
+
+      {/* MAIN CONTENT AREA */}
+      <main className="flex-1 flex flex-col overflow-hidden relative">
+       <div className="absolute top-0 right-0 w-125 h-125 bg-blue-600/5 blur-[150px] rounded-full pointer-events-none"></div>
+
+        {/* TOP BAR */}
+        <header className="h-20 border-b border-slate-800 flex items-center justify-between px-8 bg-slate-900/20 backdrop-blur-sm z-10">
+          <div className="flex items-center gap-3">
+            <ShieldCheck className="text-green-500" size={20} />
+            <span className="text-xs font-mono text-slate-400 uppercase tracking-widest">Network Secured</span>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <div className="text-right">
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Active Operator</p>
+              <p className="text-sm font-bold text-slate-200 flex items-center justify-end gap-2">
+                {userName} <User size={14} className="text-blue-500" />
+              </p>
+            </div>
+            <div className="h-10 w-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center">
+              <Plane size={18} className="text-slate-400" />
+            </div>
           </div>
         </header>
 
-        <div ref={formRef} className="col-span-12 lg:col-span-7 bg-slate-900/40 border border-slate-800 p-6 md:p-10 rounded-4xl backdrop-blur-md shadow-2xl">
-          <div className="grid grid-cols-2 gap-x-6 gap-y-8">
-            <div className="col-span-2">
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 block">Carrier Network</label>
-              <div className="relative">
-                <input 
-                  list="airline-options" 
-                  className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm focus:border-blue-500 outline-none transition-all font-mono"
-                  value={formData.airline}
-                  onChange={(e) => setFormData({...formData, airline: e.target.value})}
-                  placeholder="Type to search..."
-                />
-                <datalist id="airline-options">
-                  {options.airlines.map(airline => <option key={airline} value={airline} />)}
-                </datalist>
-                <Search className="absolute right-4 top-4 w-4 h-4 text-slate-600" />
+        {/* DASHBOARD CONTENT */}
+        <div ref={contentRef} className="flex-1 overflow-y-auto p-8 z-10">
+          
+          <div className="mb-10 animate-card">
+            <h1 className="text-4xl font-black tracking-tighter mb-2">Command Center.</h1>
+            <p className="text-slate-400 text-lg">Welcome aboard, Captain. Select a neural module to begin telemetry analysis.</p>
+          </div>
+
+          {/* SYSTEM STATS */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl animate-card">
+              <div className="flex items-center gap-3 mb-2">
+                <Server size={18} className="text-blue-500" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">API Status</span>
               </div>
+              <p className="text-3xl font-black tracking-tighter text-white">ONLINE</p>
             </div>
-            
-            <div className="col-span-1">
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 block">Origin City</label>
-              <input 
-                list="city-options"
-                className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm outline-none focus:border-blue-500"
-                value={formData.origin}
-                onChange={(e) => setFormData({...formData, origin: e.target.value})}
-              />
+            <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl animate-card">
+              <div className="flex items-center gap-3 mb-2">
+                <Zap size={18} className="text-green-500" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Model Accuracy</span>
+              </div>
+              <p className="text-3xl font-black tracking-tighter text-white">94.2%</p>
             </div>
-
-            <div className="col-span-1">
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 block">Destination</label>
-              <input 
-                list="city-options" 
-                className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm outline-none focus:border-blue-500"
-                value={formData.destination}
-                onChange={(e) => setFormData({...formData, destination: e.target.value})}
-              />
-              <datalist id="city-options">
-                {options.cities.map(city => <option key={city} value={city} />)}
-              </datalist>
-            </div>
-
-            <div className="col-span-1">
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 block">Date</label>
-              <input type="date" className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm outline-none" 
-                value={formData.date} onChange={(e) => setFormData({...formData, date: e.target.value})} />
-            </div>
-
-            <div className="col-span-1">
-              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 block">Time</label>
-              <input type="time" className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm outline-none"
-                value={formData.time} onChange={(e) => setFormData({...formData, time: e.target.value})} />
+            <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl animate-card">
+              <div className="flex items-center gap-3 mb-2">
+                <Activity size={18} className="text-red-500" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Queries Today</span>
+              </div>
+              <p className="text-3xl font-black tracking-tighter text-white">1,024</p>
             </div>
           </div>
 
-          <button 
-            onClick={handlePredict}
-            disabled={loading}
-            className="w-full mt-10 bg-blue-600 hover:bg-blue-500 text-white font-black py-5 rounded-2xl transition-all shadow-xl uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3"
-          >
-            {loading ? <Loader2 className="animate-spin" size={18} /> : 'Analyze Flight Risk'}
-          </button>
-        </div>
+          <h2 className="text-sm font-black uppercase tracking-widest text-slate-500 mb-6 animate-card">Available AI Modules</h2>
 
-        <div className="col-span-12 lg:col-span-5 h-full min-h-100">
-          {result ? (
-            <div ref={cardRef} className="h-full bg-linear-to-b from-slate-900 to-black border border-slate-800 p-10 rounded-5xl flex flex-col items-center justify-center text-center relative overflow-hidden">
-              <div className={`absolute -top-20 -right-20 w-64 h-64 blur-[120px] rounded-full opacity-20 ${result.risk_score > 40 ? 'bg-red-600' : 'bg-green-600'}`}></div>
-              <h3 className="text-7xl font-black mb-2 tracking-tighter italic">{result.risk_score}<span className="text-3xl not-italic opacity-50">%</span></h3>
-              <div className={`py-4 px-8 rounded-2xl border font-black uppercase tracking-widest text-sm ${result.risk_score > 40 ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
-                STATUS: {result.prediction}
+          {/* FEATURE CARDS */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            {/* Module 1: Delay Predictor */}
+            <div onClick={() => navigate('/delay-predictor')} className="group cursor-pointer bg-slate-900/60 border border-slate-800 hover:border-blue-500/50 p-8 rounded-4xl transition-all hover:bg-slate-800/60 hover:shadow-2xl hover:shadow-blue-900/20 relative overflow-hidden animate-card">
+              <div className="absolute -right-10 -bottom-10 opacity-5 group-hover:opacity-10 transition-opacity">
+                <Activity size={200} />
+              </div>
+              <div className="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-6 border border-blue-500/20 group-hover:scale-110 transition-transform">
+                <Activity className="text-blue-500" size={24} />
+              </div>
+              <h3 className="text-2xl font-black tracking-tighter mb-3">Delay Predictor</h3>
+              <p className="text-slate-400 text-sm leading-relaxed mb-8 max-w-sm">
+                Utilize our XGBoost model to analyze flight routes, weather patterns, and historical carrier data to predict arrival delays.
+              </p>
+              <div className="flex items-center gap-2 text-xs font-bold text-blue-500 uppercase tracking-widest">
+                Launch Module <Activity size={14} />
               </div>
             </div>
-          ) : (
-            <div className="h-full border-2 border-dashed border-slate-800/50 rounded-5xl flex flex-col items-center justify-center p-12 text-slate-700 bg-slate-900/10 text-center">
-              <Navigation className="opacity-10 animate-pulse mb-4" size={64} />
-              <p className="font-bold uppercase tracking-widest text-[10px]">Awaiting Telemetry...</p>
+
+            {/* Module 2: Price Oracle */}
+            <div onClick={() => navigate('/oracle')} className="group cursor-pointer bg-slate-900/60 border border-slate-800 hover:border-green-500/50 p-8 rounded-4xl transition-all hover:bg-slate-800/60 hover:shadow-2xl hover:shadow-green-900/20 relative overflow-hidden animate-card">
+              <div className="absolute -right-10 -bottom-10 opacity-5 group-hover:opacity-10 transition-opacity">
+                <LineChart size={200} />
+              </div>
+              <div className="w-14 h-14 bg-green-500/10 rounded-2xl flex items-center justify-center mb-6 border border-green-500/20 group-hover:scale-110 transition-transform">
+                <LineChart className="text-green-500" size={24} />
+              </div>
+              <h3 className="text-2xl font-black tracking-tighter mb-3">Price Oracle</h3>
+              <p className="text-slate-400 text-sm leading-relaxed mb-8 max-w-sm">
+                Forecast optimal ticket fares based on live market averages, routing codes, and estimated travel durations.
+              </p>
+              <div className="flex items-center gap-2 text-xs font-bold text-green-500 uppercase tracking-widest">
+                Launch Module <LineChart size={14} />
+              </div>
             </div>
-          )}
+
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

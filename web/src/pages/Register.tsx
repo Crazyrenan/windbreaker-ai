@@ -11,16 +11,20 @@ import {
 } from 'lucide-react';
 
 const Register = () => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  
   const formRef = useRef(null);
   const visualRef = useRef(null);
   const navigate = useNavigate();
 
-  // Animasi Masuk
   useEffect(() => {
     const ctx = gsap.context(() => {
       gsap.from(visualRef.current, {
-        x: 50, // Muncul dari kanan
+        x: 50,
         opacity: 0,
         duration: 1.2,
         ease: "power4.out",
@@ -28,7 +32,7 @@ const Register = () => {
       });
       
       gsap.from(formRef.current, {
-        x: -50, // Muncul dari kiri
+        x: -50,
         opacity: 0,
         duration: 1.2,
         ease: "power4.out",
@@ -38,23 +42,36 @@ const Register = () => {
     return () => ctx.revert();
   }, []);
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
     
-    // Simulasi Register
-    setTimeout(() => {
+    try {
+      const response = await fetch("http://localhost:8000/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        navigate('/login'); 
+      } else {
+        setError(data.detail || "Registrasi gagal. Silakan periksa kembali data Anda.");
+      }
+    } catch (err) {
+      setError("Gagal terhubung ke server backend.");
+    } finally {
       setLoading(false);
-      navigate('/dashboard'); 
-    }, 2000);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-[#0f172a] text-slate-100 font-sans grid grid-cols-1 lg:grid-cols-2 overflow-hidden">
+    <div className="min-h-screen bg-[#0f172a] text-slate-100 font-sans grid grid-cols-1 lg:grid-cols-2 overflow-hidden selection:bg-blue-500 selection:text-white">
       
-      {/* --- LEFT SIDE: FORM (Control Panel) --- */}
       <div className="flex items-center justify-center p-6 bg-[#0f172a] relative order-2 lg:order-1">
-        {/* Background Glow */}
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-600/10 blur-[120px] rounded-full pointer-events-none"></div>
 
         <div ref={formRef} className="w-full max-w-md space-y-10 relative z-10">
@@ -64,9 +81,14 @@ const Register = () => {
             <p className="text-slate-500">Create your account to access predictive flight telemetry.</p>
           </div>
 
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/50 text-red-500 text-[10px] font-bold uppercase tracking-widest p-4 rounded-xl">
+              ERROR: {error}
+            </div>
+          )}
+
           <form onSubmit={handleRegister} className="space-y-5">
             
-            {/* Full Name */}
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Full Name</label>
               <div className="relative group">
@@ -74,13 +96,14 @@ const Register = () => {
                 <input 
                   type="text" 
                   required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   placeholder="Captain John Doe"
                   className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 pl-12 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all font-medium placeholder-slate-700"
                 />
               </div>
             </div>
 
-            {/* Email */}
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Email Address</label>
               <div className="relative group">
@@ -88,13 +111,14 @@ const Register = () => {
                 <input 
                   type="email" 
                   required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="pilot@windbreaker.ai"
                   className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 pl-12 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all font-medium placeholder-slate-700"
                 />
               </div>
             </div>
 
-            {/* Password */}
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Set Password</label>
               <div className="relative group">
@@ -102,6 +126,8 @@ const Register = () => {
                 <input 
                   type="password" 
                   required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
                   className="w-full bg-slate-900/50 border border-slate-800 rounded-2xl p-4 pl-12 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all font-medium placeholder-slate-700"
                 />
@@ -109,7 +135,6 @@ const Register = () => {
               <p className="text-[10px] text-slate-600 pl-2">Must be at least 8 characters with 1 special symbol.</p>
             </div>
 
-            {/* Register Button */}
             <button 
               type="submit" 
               disabled={loading}
@@ -119,14 +144,12 @@ const Register = () => {
             </button>
           </form>
 
-          {/* Social / Google Login */}
           <div className="relative">
             <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-800"></div></div>
             <div className="relative flex justify-center text-xs uppercase"><span className="bg-[#0f172a] px-4 text-slate-600 font-bold tracking-widest">Or register via</span></div>
           </div>
 
           <button className="w-full bg-white hover:bg-slate-200 text-slate-900 font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-3 text-sm border border-slate-200">
-            {/* Google Icon SVG */}
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
               <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -142,13 +165,10 @@ const Register = () => {
         </div>
       </div>
 
-      {/* --- RIGHT SIDE: VISUAL (The View from 30,000ft) --- */}
       <div ref={visualRef} className="relative hidden lg:flex flex-col justify-between p-12 bg-slate-900 overflow-hidden order-1 lg:order-2">
-        {/* Abstract Background */}
         <div className="absolute top-0 left-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1559297434-fae8a1916a79?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-20 mix-blend-luminosity"></div>
         <div className="absolute top-0 left-0 w-full h-full bg-linear-to-t from-slate-900/90 via-blue-900/20 to-slate-900/60"></div>
         
-        {/* Content */}
         <div className="relative z-10 flex justify-end">
            <div className="text-xl font-black italic tracking-tighter flex items-center gap-2">
             WINDBREAKER<span className="text-blue-500">.AI</span>

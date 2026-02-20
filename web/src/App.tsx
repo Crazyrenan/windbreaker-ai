@@ -1,32 +1,40 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Landing from './pages/Landing';
+import { type ReactNode } from 'react';
+
 import Login from './pages/Login';
-import PriceOracle from './pages/PriceOracle';
-import Dashboard from './pages/Dashboard';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import Dashboard from './pages/Dashboard';
+import DelayPredictor from './pages/DelayPredictor';
+import PriceOracle from './pages/priceOracle';
 
-const App = () => {
-  const isAuthenticated = true; 
+// Ubah JSX.Element menjadi ReactNode
+const ProtectedRoute = ({ children }: { children: ReactNode }) => {
+  const isAuthenticated = localStorage.getItem("user_token") !== null;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  return children;
+};
 
+function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Halaman Depan */}
-        <Route path="/" element={<Landing />} />
-        <Route path="/oracle" element={<PriceOracle />} />
-        {/* Halaman Dashboard (Diproteksi) */}
-        <Route 
-          path="/dashboard" 
-          element={isAuthenticated ? <Dashboard /> : <Navigate to="/" />} 
-        />
-        
-        {/* Login Page (Nanti dibuat) */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
+        {/* --- AREA TERKUNCI --- */}
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        
+        {/* Rute baru untuk Delay Predictor */}
+        <Route path="/delay-predictor" element={<ProtectedRoute><DelayPredictor /></ProtectedRoute>} />
+        
+        <Route path="/oracle" element={<ProtectedRoute><PriceOracle /></ProtectedRoute>} />
+
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>
   );
-};
+}
 
 export default App;
