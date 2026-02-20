@@ -67,10 +67,8 @@ def setup_and_train():
     if 'duration' in df.columns:
         df['duration_mins'] = df['duration'].apply(parse_duration)
     else:
-        # Coba cari kolom yang mengandung 'time' dan 'travel' (misal: 'travel  time')
         time_col = [c for c in df.columns if 'time' in c and 'travel' in c]
         if time_col:
-            # PERBAIKAN: df[nama_kolom].apply(...) bukan nama_kolom.apply(...)
             df['duration_mins'] = df[time_col[0]].apply(parse_duration)
         else:
             df['duration_mins'] = 0

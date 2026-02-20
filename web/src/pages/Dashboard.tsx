@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { gsap } from 'gsap';
-// Menghapus ikon yang tidak terpakai dari daftar import
+
 import { 
   Navigation, Loader2, PlaneTakeoff, Search 
 } from 'lucide-react';

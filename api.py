@@ -2,14 +2,23 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import joblib
+import os
 import pandas as pd
 import numpy as np
-import os
+from pydantic import BaseModel
+from fastapi import HTTPException
 
-# 1. SETUP
+price_model = joblib.load("models/xgb_price.pkl")
+price_encoders = joblib.load("models/price_encoders.pkl")
+
+class PricePredictionRequest(BaseModel):
+    airline: str
+    origin: str
+    destination: str
+    duration_mins: int
+
 app = FastAPI(title="Flight Delay Predictor API")
 
-# Penting agar React (Frontend) bisa akses API ini
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -79,6 +88,32 @@ def predict_delay(input: FlightInput):
         status_code=400, 
         detail=f"Input tidak dikenal: {str(e)}. Pastikan menggunakan kode maskapai (misal: AA) dan nama kota yang sesuai dataset."
     )
+
+@app.post("/api/predict-price")
+async def predict_price(req: PricePredictionRequest):
+    try:
+        data = {
+            'airline': req.airline,
+            'origin': req.origin,
+            'destination': req.destination,
+            'duration_mins': req.duration_mins
+        }
+        df = pd.DataFrame([data])
+
+        for col in ['airline', 'origin', 'destination']:
+            le = price_encoders.get(col)
+            if le:
+                df[col] = df[col].apply(lambda x: np.where(le.classes_ == x)[0][0] if x in le.classes_ else 0)
+
+        prediction = price_model.predict(df)
+        
+        return {
+            "status": "success",
+            "estimated_price": float(prediction[0])
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
     
 @app.get("/options")
 def get_options():

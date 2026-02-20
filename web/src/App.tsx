@@ -1,11 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
+import PriceOracle from './pages/PriceOracle';
 import Dashboard from './pages/Dashboard';
 import Register from './pages/Register';
 
 const App = () => {
-  // Simulasi Auth (Nanti kita ganti dengan sistem login beneran)
   const isAuthenticated = true; 
 
   return (
@@ -13,7 +13,7 @@ const App = () => {
       <Routes>
         {/* Halaman Depan */}
         <Route path="/" element={<Landing />} />
-        
+        <Route path="/oracle" element={<PriceOracle />} />
         {/* Halaman Dashboard (Diproteksi) */}
         <Route 
           path="/dashboard" 
