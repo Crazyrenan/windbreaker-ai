@@ -11,7 +11,7 @@ router = APIRouter()
 delay_model = joblib.load(settings.DELAY_MODEL_PATH)
 delay_encoders = joblib.load(settings.DELAY_ENCODER_PATH)
 
-@router.post("/predict")
+@router.post("/predict-delay")
 async def predict_delay(req: FlightInput, current_user: dict = Depends(get_current_user)):
     try:
         dt = pd.to_datetime(req.date)
@@ -52,12 +52,13 @@ async def predict_delay(req: FlightInput, current_user: dict = Depends(get_curre
             detail=f"Inference Error: {str(e)}"
         )
 
-@router.get("/options")
-def get_options():
+@router.get("/delay-options")
+def get_delay_options():
     try:
-        return {
-            "airlines": delay_encoders['Marketing_Airline_Network'].classes_.tolist(),
-            "cities": delay_encoders['OriginCityName'].classes_.tolist() 
-        }
+        airlines = delay_encoders['Marketing_Airline_Network'].classes_.tolist()
+        origins = delay_encoders['OriginCityName'].classes_.tolist()
+        destinations = delay_encoders['DestCityName'].classes_.tolist()
+        cities = sorted(list(set(origins + destinations)))
+        return {"airlines": airlines, "cities": cities}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
