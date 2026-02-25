@@ -137,20 +137,35 @@ npm run dev
 http://localhost:5173
 ```
 ## 📁 Project Structure
+
+```bash
 WINDBREAKER.AI/
 │
-├── api.py
-├── model/
-│   ├── xgb_model.pkl
-│   ├── encoder_origin.pkl
-│   └── encoder_dest.pkl
+├── backend/
+│   ├── api.py
+│   ├── model/
+│   │   ├── xgb_model.pkl
+│   │   ├── encoder_origin.pkl
+│   │   └── encoder_dest.pkl
+│   ├── requirements.txt
+│   └── .env
 │
 ├── web/
-│   ├── src/
 │   ├── public/
-│   └── package.json
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── hooks/
+│   │   ├── App.tsx
+│   │   └── main.tsx
+│   ├── package.json
+│   ├── vite.config.ts
+│   └── .env
 │
+├── data/                # (Optional - local dataset)
+├── .gitignore
 └── README.md
+```
 
 🎯 Engineering Highlights
 
@@ -189,5 +204,6 @@ Jonathan Axl Wibowo
 📧 Email: jonathan.axlw@gmail.com
 
 <p align="center"> <i>Built with precision, engineered for scalability, and designed with modern SaaS principles.</i> </p> ```
+
 
 
