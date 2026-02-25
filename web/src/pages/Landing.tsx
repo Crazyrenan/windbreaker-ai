@@ -1,240 +1,374 @@
-import { useEffect, useRef } from 'react';
-import { Navigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
-import { gsap } from 'gsap';
-import { 
-  ArrowRight, 
-  BarChart3, 
-  PieChart, 
-  Activity 
-} from 'lucide-react';
+import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { motion } from "framer-motion";
+import {
+  Plane,
+  ArrowRight,
+  ShieldCheck,
+  TrendingUp,
+  Cpu,
+} from "lucide-react";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const Landing = () => {
-  const isAuthenticated = localStorage.getItem("user_token") !== null;
-  if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
-  }
-  const heroRef = useRef(null);
-  const textRef = useRef(null);
-  const ctaRef = useRef(null);
-  const bioRef = useRef(null);
+  const navigate = useNavigate();
+  const container = useRef(null);
 
   useEffect(() => {
+    // Timer singkat untuk memastikan DOM sudah stabil sebelum hitung posisi ScrollTrigger
+    const timer = setTimeout(() => ScrollTrigger.refresh(), 200);
+
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline();
       
-      tl.fromTo(heroRef.current, 
-        { opacity: 0, y: 100 }, 
-        { opacity: 1, y: 0, duration: 1, ease: "power4.out" }
-      )
-      .fromTo(textRef.current,
-        { opacity: 0, scale: 0.9 },
-        { opacity: 1, scale: 1, duration: 0.8 },
-        "-=0.5"
-      )
-      .fromTo(ctaRef.current,
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.5 },
-        "-=0.3"
+      // HERO REVEAL - Gunakan fromTo agar opacity 0 benar-benar terpicu
+      gsap.fromTo(".hero-reveal", 
+        { y: 80, opacity: 0, filter: "blur(10px)" },
+        {
+          y: 0,
+          opacity: 1,
+          filter: "blur(0px)",
+          duration: 1.2,
+          stagger: 0.15,
+          ease: "power3.out"
+        }
       );
-    });
-    return () => ctx.revert();
+
+      // PARALLAX MOCKUP
+      gsap.to(".mockup", {
+        y: -30,
+        duration: 4,
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut"
+      });
+
+      // SECTION REVEAL
+      gsap.utils.toArray(".section-animate").forEach((section: any) => {
+        gsap.fromTo(section,
+          { y: 60, opacity: 0, filter: "blur(8px)" },
+          {
+            y: 0,
+            opacity: 1,
+            filter: "blur(0px)",
+            duration: 1,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: section,
+              start: "top 85%",
+              toggleActions: "play none none none"
+            }
+          }
+        );
+      });
+
+      // COUNTER ANIMATION - Perbaikan logika innerText
+      gsap.utils.toArray(".counter").forEach((el: any) => {
+        const target = +el.getAttribute("data-target");
+        gsap.fromTo(
+          el,
+          { innerText: 0 },
+          {
+            innerText: target,
+            duration: 2,
+            ease: "power2.out",
+            snap: { innerText: 1 },
+            scrollTrigger: {
+              trigger: el,
+              start: "top 90%",
+            },
+            onUpdate: function() {
+              // Menambahkan pemisah ribuan jika perlu
+              if (el.innerText > 999) {
+                el.innerText = Math.floor(el.innerText).toLocaleString();
+              }
+            }
+          }
+        );
+      });
+
+    }, container);
+
+    return () => {
+      ctx.revert();
+      clearTimeout(timer);
+    };
   }, []);
 
   return (
-    <div className="min-h-screen bg-app-bg text-slate-100 font-sans overflow-hidden selection:bg-blue-500 selection:text-white">
-      
-      {/* --- NAVBAR --- */}
-      <nav className="fixed top-0 w-full p-6 flex justify-between items-center z-50 backdrop-blur-sm bg-slate-900/30 border-b border-white/5">
-        <div className="text-xl font-black italic tracking-tighter">
+    <div
+      ref={container}
+      className="bg-[#050B14] text-white overflow-x-hidden font-sans relative"
+    >
+      {/* Background Mesh */}
+      <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_20%_20%,rgba(37,99,235,0.12),transparent_40%),radial-gradient(circle_at_80%_30%,rgba(99,102,241,0.1),transparent_40%)]" />
+
+      {/* NAV */}
+      <nav className="max-w-7xl mx-auto px-6 py-6 flex justify-between items-center relative z-50">
+        <div className="flex items-center gap-2 font-black italic tracking-tight text-xl cursor-pointer" onClick={() => navigate("/")}>
+          <Plane className="text-blue-500" size={24} />
           WINDBREAKER<span className="text-blue-500">.AI</span>
         </div>
-        <div className="flex gap-4 text-sm font-bold">
-          <Link to="/login" className="px-4 py-2 hover:text-blue-400 transition-colors">LOGIN</Link>
-          <Link to="/register" className="px-6 py-2 bg-white text-black rounded-full hover:bg-blue-500 hover:text-white transition-all shadow-lg shadow-white/5 uppercase tracking-widest text-[10px] flex items-center justify-center">
-            Get Started
-          </Link>
-        </div>
+        <button
+          onClick={() => navigate("/login")}
+          className="px-6 py-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition font-bold text-sm uppercase tracking-widest"
+        >
+          Control Panel
+        </button>
       </nav>
 
-      {/* --- HERO SECTION --- */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center text-center px-4 pt-20">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 bg-blue-600/20 blur-[120px] rounded-full -z-10 animate-pulse"></div>
-        <div ref={heroRef} className="max-w-5xl mx-auto space-y-6">
-          <p className="text-blue-500 font-mono text-xs md:text-sm tracking-[0.3em] uppercase mb-4">Next Gen Flight Analytics</p>
-          <h1 className="text-6xl md:text-9xl font-black tracking-tighter leading-[0.9] text-transparent bg-clip-text bg-linear-to-b from-white via-slate-200 to-slate-600 uppercase">
-            Predict <br/> The Future.
-          </h1>
+      {/* HERO */}
+      <section className="relative min-h-screen flex flex-col items-center justify-start text-center px-6 pt-32">
+        <h1 className="hero-reveal text-5xl md:text-7xl lg:text-8xl font-black leading-[0.9] max-w-5xl tracking-tighter">
+          Predict Flight Delays
+          <br />
+          <span className="text-blue-500 italic">
+            Before They Disrupt You.
+          </span>
+        </h1>
+
+        <p className="hero-reveal mt-8 text-lg md:text-xl text-slate-400 max-w-2xl leading-relaxed">
+          Machine learning–powered aviation intelligence that forecasts delay
+          probabilities and estimates fair ticket pricing in real time.
+        </p>
+
+        <div className="hero-reveal mt-12 flex flex-col sm:flex-row gap-4">
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="group px-10 py-5 bg-blue-600 hover:bg-blue-500 rounded-2xl font-black flex items-center gap-3 transition-all shadow-xl shadow-blue-600/20 uppercase tracking-widest text-sm"
+          >
+            Launch Platform
+            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+          </button>
+          <button className="px-10 py-5 border border-white/10 bg-white/5 rounded-2xl hover:bg-white/10 transition font-black uppercase tracking-widest text-sm">
+            Documentation
+          </button>
         </div>
-        <div ref={textRef} className="max-w-2xl mx-auto mt-8 mb-12">
-          <p className="text-slate-400 text-lg md:text-xl font-medium leading-relaxed">
-            Powered by XGBoost & Neural Networks to analyze flight patterns with <span className="text-white font-bold italic">98.4% accuracy</span>.
+
+        {/* Dashboard Preview Mockup */}
+        <div className="mockup mt-24 relative z-10">
+          <div className="relative group">
+            <div className="absolute -inset-1 bg-linear-to-r from-blue-600 to-indigo-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
+            <img
+              src="/dashboard-preview.png" 
+              alt="Dashboard Preview"
+              className="relative rounded-2xl border border-white/10 shadow-2xl w-250 max-w-full"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* METRICS */}
+      <section className="section-animate py-32 border-y border-white/5 bg-white/2 backdrop-blur-3xl relative z-20">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
+          {[
+            { value: 88, suffix: "%", label: "Prediction Accuracy" },
+            { value: 50000, suffix: "+", label: "Flights Trained" },
+            { value: 1200, suffix: "+", label: "Global Routes" },
+            { value: 2, suffix: "s", label: "Avg. Response Time" }
+          ].map((item, i) => (
+            <div key={i} className="flex flex-col items-center">
+              <div className="text-4xl md:text-5xl font-black text-white flex items-baseline">
+                <span
+                  className="counter"
+                  data-target={item.value}
+                >
+                  0
+                </span>
+                <span className="text-blue-500">{item.suffix}</span>
+              </div>
+              <div className="text-slate-500 mt-3 text-xs font-black uppercase tracking-widest">
+                {item.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* FEATURES */}
+      <section className="section-animate py-40 max-w-7xl mx-auto px-6 relative z-20">
+        <div className="text-center mb-24">
+          <h2 className="text-4xl md:text-5xl font-black italic tracking-tighter uppercase">
+            Built for <span className="text-blue-500">Intelligence.</span>
+          </h2>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-8">
+          {[
+            {
+              icon: <TrendingUp size={32} />,
+              title: "Delay Forecasting",
+              desc: "Supervised ML model optimized for structured aviation datasets with XGBoost integration."
+            },
+            {
+              icon: <Cpu size={32} />,
+              title: "Dynamic Pricing",
+              desc: "Real-time fair ticket value estimation using historical volatility and carrier demand."
+            },
+            {
+              icon: <ShieldCheck size={32} />,
+              title: "Risk Scoring",
+              desc: "Probability-based risk assessment to provide clarity for safer itinerary decisions."
+            }
+          ].map((item, i) => (
+            <div
+              key={i}
+              className="p-10 rounded-3xl bg-white/3 border border-white/10 backdrop-blur-xl hover:border-blue-500/40 hover:bg-white/6 transition-all group"
+            >
+              <div className="text-blue-500 mb-8 p-3 bg-blue-500/10 w-fit rounded-2xl group-hover:scale-110 transition-transform">
+                {item.icon}
+              </div>
+              <h3 className="font-black italic text-xl mb-4 uppercase tracking-tight">
+                {item.title}
+              </h3>
+              <p className="text-slate-400 text-sm leading-relaxed font-medium">
+                {item.desc}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+      
+      {/* PRICING */}
+      <section className="section-animate py-40 max-w-7xl mx-auto px-6 relative z-20">
+        <div className="text-center mb-24">
+          <h2 className="text-4xl md:text-5xl font-black italic tracking-tighter uppercase">
+            Transparent <span className="text-blue-500">Pricing</span>
+          </h2>
+          <p className="text-slate-400 mt-6">
+            Built for individuals, teams, and enterprise aviation partners.
           </p>
         </div>
-        <div ref={ctaRef} className="flex flex-col md:flex-row gap-4 items-center">
-          <Link to="/dashboard" className="group relative px-8 py-4 bg-blue-600 rounded-full font-black tracking-widest text-sm hover:bg-blue-500 transition-all flex items-center gap-3 shadow-2xl shadow-blue-600/20">
-            LAUNCH DASHBOARD
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
+
+        <div className="grid md:grid-cols-3 gap-8">
+          {[
+            { name: "Starter", price: "$29", desc: "For individual analysts & travelers." },
+            { name: "Pro", price: "$99", desc: "Advanced forecasting & API access." },
+            { name: "Enterprise", price: "Custom", desc: "Dedicated ML pipelines & SLA." }
+          ].map((plan, i) => (
+            <motion.div
+              key={i}
+              whileHover={{ scale: 1.05, y: -8 }}
+              transition={{ type: "spring", stiffness: 200 }}
+              className="p-10 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl hover:border-blue-500/40 transition-all"
+            >
+              <h3 className="text-xl font-black uppercase mb-6">{plan.name}</h3>
+              <div className="text-4xl font-black text-blue-500 mb-6">{plan.price}</div>
+              <p className="text-slate-400 text-sm mb-8">{plan.desc}</p>
+              <button className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 transition font-bold uppercase text-sm tracking-widest">
+                Choose Plan
+              </button>
+            </motion.div>
+          ))}
         </div>
       </section>
 
-      {/* --- SECTION: COMPANY BIO --- */}
-      <section ref={bioRef} className="py-32 px-4 relative overflow-hidden border-t border-white/5">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+      {/* API SECTION */}
+      <section className="section-animate py-40 border-y border-white/5 bg-white/5 relative z-20">
+        <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-20 items-center">
+
           <div>
-            <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-none mb-8 uppercase">
-              The Story of <br/>
-              <span className="text-blue-500">Windbreaker.</span>
+            <h2 className="text-4xl font-black italic uppercase mb-8">
+              Developer <span className="text-blue-500">API</span>
             </h2>
-          </div>
-          <div className="space-y-6 text-slate-400 text-lg leading-relaxed font-medium">
-            <p>
-              Lahir dari kebutuhan akan kepastian di tengah ketidakpastian logistik penerbangan global. 
-              <span className="text-white font-bold"> Windbreaker.ai</span> hadir sebagai pelindung rencana perjalanan Anda.
+            <p className="text-slate-400 mb-10">
+              Integrate our delay prediction and pricing intelligence directly into your platform.
             </p>
-            <p>
-              Dimulai dari riset mendalam di <span className="text-slate-200">Universitas Multimedia Nusantara</span>, kami menganalisis jutaan data untuk menemukan pola keterlambatan. Nama kami melambangkan ketangguhan—seperti jaket Windbreaker yang melindungi Anda dari terpaan rintangan.
-            </p>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-8 py-4 bg-blue-600 hover:bg-blue-500 rounded-xl font-black uppercase text-sm tracking-widest transition"
+            >
+              View Documentation
+            </motion.button>
           </div>
+
+          <motion.div
+            initial={{ opacity: 0, x: 60 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1 }}
+            viewport={{ once: true }}
+            className="bg-black/40 border border-white/10 rounded-2xl p-8 font-mono text-sm text-slate-300"
+          >
+      {`POST /api/v1/predict
+      {
+        "origin": "CGK",
+        "destination": "HND",
+        "airline": "ANA",
+        "departure_time": "2026-05-02T08:00:00"
+      }
+
+      Response:
+      {
+        "delay_probability": 0.18,
+        "fair_price_estimate": 742.50
+      }`}
+          </motion.div>
+
         </div>
       </section>
 
-      {/* --- SECTION: DATA INSIGHTS --- */}
-      <section className="py-32 px-4 bg-slate-900/30 border-y border-white/5">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-5xl md:text-7xl font-black tracking-tighter mb-4 uppercase text-white">Data Insights.</h2>
-            <p className="text-slate-500 font-mono tracking-widest uppercase text-xs">Real-time telemetry processing</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <DataCard 
-              icon={<Activity className="text-blue-500 w-8 h-8" />}
-              label="Model Accuracy"
-              value="98.4"
-              suffix="%"
-              color="bg-blue-500"
-              width="w-[98.4%]"
-            />
-            <DataCard 
-              icon={<BarChart3 className="text-green-500 w-8 h-8" />}
-              label="Historical Records"
-              value="2.4"
-              suffix="M+"
-              color="bg-green-500"
-              subtext="FLIGHT VECTORS ANALYZED"
-            />
-            <DataCard 
-              icon={<PieChart className="text-purple-500 w-8 h-8" />}
-              label="Avg Latency"
-              value="140"
-              suffix="ms"
-              color="bg-purple-500"
-              subtext="FASTAPI RESPONSE TIME"
-            />
-          </div>
+      {/* AI RESEARCH */}
+      <section className="section-animate py-40 max-w-7xl mx-auto px-6 relative z-20 text-center">
+        <h2 className="text-4xl md:text-5xl font-black italic uppercase mb-12">
+          Built for <span className="text-blue-500">AI Competitions</span>
+        </h2>
+
+        <p className="text-slate-400 max-w-3xl mx-auto mb-20">
+          WINDBREAKER.AI is architected as a modular ML system suitable for
+          research, Kaggle competitions, and predictive modeling showcases.
+        </p>
+
+        <div className="grid md:grid-cols-3 gap-8">
+          {[
+            "XGBoost-based structured data modeling",
+            "Feature engineering pipeline for time-series aviation data",
+            "Scalable evaluation & cross-validation system"
+          ].map((item, i) => (
+            <motion.div
+              key={i}
+              whileHover={{ scale: 1.04 }}
+              className="p-10 bg-white/5 border border-white/10 rounded-3xl backdrop-blur-xl"
+            >
+              <p className="text-slate-300 font-medium">{item}</p>
+            </motion.div>
+          ))}
         </div>
       </section>
 
-      {/* --- SECTION: PRICING --- */}
-      <section className="py-32 px-4 relative">
-        <div className="max-w-7xl mx-auto text-center mb-20">
-          <h2 className="text-5xl md:text-7xl font-black tracking-tighter mb-4 uppercase">Pricing Plans.</h2>
-          <p className="text-slate-500 font-mono tracking-widest uppercase text-xs">Choose your level of certainty</p>
-        </div>
+      {/* FINAL CTA */}
+      <section className="section-animate py-40 text-center relative z-20">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-100 bg-blue-600/10 blur-[150px] -z-10" />
 
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* TIER 1: FREE (The Explorer) */}
-          <div className="p-10 rounded-4xl border border-slate-800 bg-slate-900/20 backdrop-blur-sm flex flex-col hover:border-slate-700 transition-colors">
-            <div className="mb-8">
-              <h3 className="text-xl font-bold text-slate-400 uppercase tracking-widest mb-2 text-[10px]">Explorer</h3>
-              <div className="text-5xl font-black tracking-tighter">$0<span className="text-lg font-normal text-slate-600">/mo</span></div>
-            </div>
-            <ul className="space-y-4 mb-10 grow">
-              <PricingFeature text="3 AI Predictions / day" active />
-              <PricingFeature text="Standard Carriers Only" active />
-              <PricingFeature text="Basic Risk Assessment" active />
-              <PricingFeature text="Email Support" active />
-              <PricingFeature text="Advanced Analytics" active={false} />
-            </ul>
-            <Link to="/dashboard" className="block w-full py-4 text-center rounded-xl border border-slate-700 hover:bg-slate-800 font-bold transition-all uppercase text-[10px] tracking-widest">
-              Get Started
-            </Link>
-          </div>
-
-          {/* TIER 2: PRO (The Frequent Flyer) */}
-          <div className="relative p-10 rounded-4xl border-2 border-blue-500 bg-blue-600/5 backdrop-blur-md flex flex-col transform md:-translate-y-4 shadow-2xl shadow-blue-500/10">
-            <div className="absolute top-0 right-10 -translate-y-1/2 bg-blue-600 text-[8px] font-black px-4 py-1 rounded-full uppercase tracking-widest">Most Popular</div>
-            <div className="mb-8">
-              <h3 className="text-xl font-bold text-blue-400 uppercase tracking-widest mb-2 text-[10px]">Frequent Flyer</h3>
-              <div className="text-5xl font-black tracking-tighter">$12<span className="text-lg font-normal text-slate-500">/mo</span></div>
-            </div>
-            <ul className="space-y-4 mb-10 grow">
-              <PricingFeature text="Unlimited AI Predictions" active />
-              <PricingFeature text="All Carriers Worldwide" active />
-              <PricingFeature text="Real-time Weather Integration" active />
-              <PricingFeature text="Detailed Delay Probability" active />
-              <PricingFeature text="Priority 24/7 Support" active />
-            </ul>
-            <button className="block w-full py-4 rounded-xl bg-blue-600 text-white font-black hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20 uppercase text-[10px] tracking-widest">
-              Upgrade to Pro
-            </button>
-          </div>
-
-          {/* TIER 3: ENTERPRISE (The Aviator) - COMING SOON */}
-          <div className="p-10 rounded-4xl border border-slate-800 bg-slate-950/50 backdrop-blur-sm flex flex-col opacity-80">
-            <div className="mb-8">
-              <h3 className="text-xl font-bold text-slate-500 uppercase tracking-widest mb-2 text-[10px]">Aviator</h3>
-              <div className="text-5xl font-black tracking-tighter text-slate-600">$29<span className="text-lg font-normal text-slate-700">/mo</span></div>
-            </div>
-            <ul className="space-y-4 mb-10 grow">
-              <PricingFeature text="Full API Access" active />
-              <PricingFeature text="Historical Trend Export" active />
-              <PricingFeature text="Custom Alert Systems" active />
-              <PricingFeature text="Team Collaboration" active />
-              <PricingFeature text="Live Satellite Tracking" active={false} isComingSoon />
-            </ul>
-            <button disabled className="block w-full py-4 rounded-xl border border-slate-800 text-slate-600 font-bold cursor-not-allowed uppercase text-[10px] tracking-widest">
-              Coming Soon
-            </button>
-          </div>
+        <div className="max-w-4xl mx-auto px-6">
+          <h2 className="text-5xl md:text-7xl font-black mb-8 italic tracking-tighter uppercase leading-none">
+            Ready for <span className="text-blue-500">Takeoff?</span>
+          </h2>
+          <p className="text-slate-400 text-lg mb-12 font-medium">
+            Join the next generation of predictive aviation intelligence.
+          </p>
+          <button
+            onClick={() => navigate("/login")}
+            className="px-12 py-6 bg-white text-black hover:bg-slate-200 rounded-2xl font-black text-sm uppercase tracking-[0.2em] transition-all shadow-2xl shadow-white/10 active:scale-95"
+          >
+            Get Started Now
+          </button>
         </div>
       </section>
 
-      <footer className="py-10 text-center text-slate-600 text-sm font-mono border-t border-white/5 mt-20">
-        © 2026 WINDBREAKER.AI INC. ALL RIGHTS RESERVED.
+      <footer className="border-t border-white/5 py-12 px-6 flex flex-col md:flex-row justify-between items-center gap-6 max-w-7xl mx-auto text-slate-500 text-[10px] font-black uppercase tracking-widest relative z-20">
+        <div>© 2026 Windbreaker AI Systems</div>
+        <div className="flex gap-8">
+          <a href="#" className="hover:text-blue-500 transition">Privacy</a>
+          <a href="#" className="hover:text-blue-500 transition">Terms</a>
+          <a href="#" className="hover:text-blue-500 transition">GitHub</a>
+        </div>
       </footer>
     </div>
   );
 };
-
-const DataCard = ({ icon, label, value, suffix, color, width, subtext }: any) => (
-  <div className="bg-slate-950 p-8 rounded-4xl border border-white/5 relative overflow-hidden group">
-    <div className="mb-10 flex justify-between items-start">
-      <div className="p-3 bg-slate-900 rounded-2xl">{icon}</div>
-      <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-2">{label}</h3>
-    </div>
-    <div className="flex items-end gap-2 mb-4">
-      <span className="text-6xl font-black italic tracking-tighter">{value}</span>
-      <span className={`text-2xl font-bold mb-2 ${color.replace('bg-', 'text-')}`}>{suffix}</span>
-    </div>
-    {width ? (
-      <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-        <div className={`${color} h-full ${width} animate-pulse`}></div>
-      </div>
-    ) : (
-      <p className="text-[10px] text-slate-600 font-black tracking-widest">{subtext}</p>
-    )}
-  </div>
-);
-
-const PricingFeature = ({ text, active, isComingSoon }: { text: string; active: boolean; isComingSoon?: boolean }) => (
-  <li className={`flex items-center gap-3 text-[12px] ${active ? 'text-slate-300' : 'text-slate-600'}`}>
-    <div className={`w-1 h-1 rounded-full ${active ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]' : 'bg-slate-700'}`}></div>
-    <span className={isComingSoon ? 'italic font-medium' : 'font-medium'}>
-      {text} {isComingSoon && <span className="text-[8px] bg-slate-800 px-2 py-0.5 rounded ml-1 text-slate-400 font-bold uppercase tracking-tighter">Soon</span>}
-    </span>
-  </li>
-);
 
 export default Landing;
