@@ -124,3 +124,70 @@ Categorical variables (`Origin`, `Dest`) are transformed using persistent LabelE
 ```bash
 pip install pandas scikit-learn xgboost fastapi uvicorn joblib
 python api.py
+API runs at:
+http://localhost:8000
+http://localhost:8000/docs
+```
+
+## ⚛️ Frontend Setup
+```bash
+cd web
+npm install
+npm run dev
+http://localhost:5173
+```
+## 📁 Project Structure
+WINDBREAKER.AI/
+│
+├── api.py
+├── model/
+│   ├── xgb_model.pkl
+│   ├── encoder_origin.pkl
+│   └── encoder_dest.pkl
+│
+├── web/
+│   ├── src/
+│   ├── public/
+│   └── package.json
+│
+└── README.md
+
+🎯 Engineering Highlights
+
+Modular ML pipeline
+
+Production-style API layering
+
+Type-safe frontend architecture
+
+Motion-driven UI micro-interactions
+
+Separation of training and inference logic
+
+Clean Git structure for ML artifacts
+
+🧪 Designed For
+
+AI/ML Competitions
+
+Portfolio Demonstration
+
+SaaS System Design Showcase
+
+Predictive Modeling Research
+
+Aviation Data Analytics
+
+👨‍💻 Author
+
+Jonathan Axl Wibowo
+
+🌐 Portfolio: 
+
+💼 LinkedIn: nkedin.com/in/jonathan-axl-b10567253/
+
+📧 Email: jonathan.axlw@gmail.com
+
+<p align="center"> <i>Built with precision, engineered for scalability, and designed with modern SaaS principles.</i> </p> ```
+
+
