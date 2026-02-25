@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { Navigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { 
@@ -9,6 +10,10 @@ import {
 } from 'lucide-react';
 
 const Landing = () => {
+  const isAuthenticated = localStorage.getItem("user_token") !== null;
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
   const heroRef = useRef(null);
   const textRef = useRef(null);
   const ctaRef = useRef(null);

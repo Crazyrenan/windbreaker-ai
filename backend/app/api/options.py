@@ -8,10 +8,8 @@ router = APIRouter()
 def get_options():
     try:
         df = pd.read_csv("flight.csv")
-        # Bersihkan spasi dan buat lowercase untuk konsistensi dengan training
         df.columns = df.columns.str.strip().str.lower()
         
-        # Mapping kolom sesuai dataset Anda
         airline_col = 'airline name'
         origin_col = 'depreture airport'
         dest_col = 'destination airport'

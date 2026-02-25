@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { type ReactNode } from 'react';
 
+import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
@@ -25,6 +26,9 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* RUTE PUBLIK */}
+        {/* Ubah rute akar (/) untuk memanggil Landing, bukan redirect */}
+        <Route path="/" element={<Landing />} /> 
+        
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -43,8 +47,8 @@ function App() {
           element={<ProtectedLayout><PriceOracle /></ProtectedLayout>} 
         />
 
-        {/* REDIRECT DEFAULT */}
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        {/* FALLBACK: Jika rute tidak ditemukan, arahkan ke landing atau login */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );

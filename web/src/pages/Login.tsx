@@ -10,7 +10,7 @@ import {
   Fingerprint
 } from 'lucide-react';
 
-const Login = () => {
+const Login = () => { 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -78,7 +78,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f172a] text-slate-100 font-sans grid grid-cols-1 lg:grid-cols-2 overflow-hidden selection:bg-blue-500 selection:text-white">
+    <div className="min-h-screen bg-app-bg text-slate-100 font-sans grid grid-cols-1 lg:grid-cols-2 overflow-hidden selection:bg-blue-500 selection:text-white">
       
       <div ref={visualRef} className="relative hidden lg:flex flex-col justify-between p-12 bg-slate-900 overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=2074&auto=format&fit=crop')] bg-cover bg-center opacity-20 mix-blend-luminosity"></div>
@@ -110,7 +110,7 @@ const Login = () => {
       </div>
 
       {/* --- RIGHT SIDE: FORM (Control Panel) --- */}
-      <div className="flex items-center justify-center p-6 bg-[#0f172a] relative">
+      <div className="flex items-center justify-center p-6 bg-app-bg relative">
         {/* Mobile Background Glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-600/10 blur-[100px] rounded-full pointer-events-none"></div>
 
@@ -178,7 +178,7 @@ const Login = () => {
           {/* Social / Alternative */}
           <div className="relative">
             <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-800"></div></div>
-            <div className="relative flex justify-center text-xs uppercase"><span className="bg-[#0f172a] px-4 text-slate-600 font-bold tracking-widest">Or access via</span></div>
+            <div className="relative flex justify-center text-xs uppercase"><span className="bg-app-bg px-4 text-slate-600 font-bold tracking-widest">Or access via</span></div>
           </div>
 
           <button className="w-full bg-slate-900 border border-slate-800 hover:bg-slate-800 active:scale-[0.98] text-slate-300 font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-3 text-sm">

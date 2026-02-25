@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-// Hapus 'Activity' dari baris import ini
-import { Loader2, Navigation } from 'lucide-react';
+import { Loader2, Navigation, AlertTriangle, CheckCircle, AlertOctagon } from 'lucide-react';
 
 const DelayPredictor = () => {
   const [formData, setFormData] = useState({
@@ -25,7 +24,7 @@ const DelayPredictor = () => {
           setFormData(prev => ({ ...prev, airline: res.data.airlines[0] }));
         }
       } catch (err) {
-        console.error(err);
+        console.error("Gagal memuat opsi:", err);
       }
     };
     fetchOptions();
@@ -47,13 +46,43 @@ const DelayPredictor = () => {
     }
   };
 
+  // Logika Visualisasi Risiko (Risk Engine Logic)
+  const getRiskMeta = (score: number) => {
+    if (score < 40) return { 
+      label: "LOW RISK", 
+      desc: "On-Time Likely",
+      color: "text-emerald-400", 
+      bg: "bg-emerald-500", 
+      border: "border-emerald-500/30",
+      icon: <CheckCircle size={24} className="text-emerald-400" />
+    };
+    if (score < 65) return { 
+      label: "MODERATE RISK", 
+      desc: "Potential Delay",
+      color: "text-amber-400", 
+      bg: "bg-amber-500", 
+      border: "border-amber-500/30",
+      icon: <AlertTriangle size={24} className="text-amber-400" />
+    };
+    return { 
+      label: "HIGH RISK", 
+      desc: "Delay Likely",
+      color: "text-rose-500", 
+      bg: "bg-rose-500", 
+      border: "border-rose-500/30",
+      icon: <AlertOctagon size={24} className="text-rose-500" />
+    };
+  };
+
+  const riskMeta = result ? getRiskMeta(result.risk_score) : null;
+
   return (
     <div className="max-w-6xl w-full grid grid-cols-12 gap-6 mx-auto">
       <div className="col-span-12 mb-6">
         <h2 className="text-3xl font-black italic tracking-tighter uppercase">
-          Delay<span className="text-brand-blue"> Predictor</span>
+          Delay<span className="text-brand-blue"> Risk Engine</span>
         </h2>
-        <p className="text-nav-fg font-bold text-xs uppercase tracking-[0.2em]">Neural Intelligence Inference Engine</p>
+        <p className="text-nav-fg font-bold text-xs uppercase tracking-[0.2em]">Flight Schedule Volatility Analysis</p>
       </div>
 
       <div className="col-span-12 lg:col-span-7 bg-slate-900/40 border border-app-border p-10 rounded-4xl backdrop-blur-md">
@@ -124,22 +153,40 @@ const DelayPredictor = () => {
         </button>
       </div>
 
-      <div className="col-span-12 lg:col-span-5 h-full min-h-[400px]">
-        {result ? (
-          <div className="h-full bg-gradient-to-b from-slate-900 to-black border border-app-border p-10 rounded-5xl flex flex-col items-center justify-center text-center relative overflow-hidden shadow-2xl">
-            <div className={`absolute -top-20 -right-20 w-64 h-64 blur-[120px] rounded-full opacity-20 ${result.risk_score > 40 ? 'bg-brand-danger' : 'bg-green-600'}`}></div>
-            <h3 className="text-[10px] font-black text-nav-fg uppercase tracking-widest mb-6">Delay Probability</h3>
-            <h3 className="text-7xl font-black mb-6 tracking-tighter italic">
-              {result.risk_score}<span className="text-3xl not-italic opacity-50">%</span>
+      <div className="col-span-12 lg:col-span-5 h-full min-h-100">
+        {result && riskMeta ? (
+          <div className="h-full bg-linear-to-b from-slate-900 to-black border border-app-border p-10 rounded-5xl flex flex-col items-center justify-center text-center relative overflow-hidden shadow-2xl">
+            {/* Ambient Glow sesuai tingkat risiko */}
+            <div className={`absolute -top-20 -right-20 w-64 h-64 blur-[120px] rounded-full opacity-20 ${riskMeta.bg}`}></div>
+            
+            <h3 className="text-[10px] font-black text-nav-fg uppercase tracking-widest mb-2">Calculated Risk Score</h3>
+            
+            <h3 className="text-8xl font-black mb-2 tracking-tighter italic text-white">
+              {result.risk_score}
             </h3>
-            <div className={`py-4 px-8 rounded-2xl border font-black uppercase tracking-widest text-sm ${result.risk_score > 40 ? 'bg-brand-danger/20 text-brand-danger border-brand-danger/30' : 'bg-green-500/20 text-green-400 border-green-500/30'}`}>
-              STATUS: {result.prediction}
+            
+            <div className="flex items-center gap-2 mb-8 opacity-60">
+              <span className="text-xs font-bold uppercase tracking-widest">Probability: {(result.probability * 100).toFixed(1)}%</span>
             </div>
+
+            <div className={`w-full py-6 px-8 rounded-3xl border flex items-center justify-between ${riskMeta.bg}/10 ${riskMeta.border}`}>
+              <div className="flex flex-col items-start">
+                <span className={`text-[10px] font-black uppercase tracking-widest opacity-70 mb-1 ${riskMeta.color}`}>Risk Level</span>
+                <span className={`text-2xl font-black italic tracking-tight ${riskMeta.color}`}>{riskMeta.label}</span>
+              </div>
+              <div className={`p-3 rounded-full ${riskMeta.bg}/20`}>
+                {riskMeta.icon}
+              </div>
+            </div>
+            
+            <p className="mt-6 text-[10px] font-bold text-nav-fg uppercase tracking-widest opacity-40">
+              {riskMeta.desc} • Based on Historical Patterns
+            </p>
           </div>
         ) : (
-          <div className="h-full border-2 border-dashed border-app-border rounded-5xl flex flex-col items-center justify-center p-12 text-nav-fg bg-slate-900/10 text-center">
+          <div className="h-full border-2 border-dashed border-app-border rounded-5xl flex flex-col items-center justify-center p-12 text-nav-fg bg-app-bg text-center">
             <Navigation className="opacity-10 animate-pulse mb-4" size={64} />
-            <p className="font-bold uppercase tracking-widest text-[10px]">Awaiting Telemetry...</p>
+            <p className="font-bold uppercase tracking-widest text-[10px]">Awaiting Flight Data...</p>
           </div>
         )}
       </div>

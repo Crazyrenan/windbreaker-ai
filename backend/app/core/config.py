@@ -3,13 +3,9 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "WINDBREAKER.AI"
-    
-    # --- Authentication Settings ---
-    # In a real app, generate a secure random key and store it in an environment variable
     SECRET_KEY: str = os.getenv("SECRET_KEY", "your-super-secret-key-change-this-in-production")
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-    # -------------------------------
 
     DB_PATH: str = "windbreaker_users.db"
     
@@ -22,6 +18,6 @@ class Settings(BaseSettings):
     
     # Lokasi Model & Encoder Delay
     DELAY_MODEL_PATH: str = os.path.join(BASE_DIR, "models", "xgb_flight_delay.pkl")
-    DELAY_ENCODER_PATH: str = os.path.join(BASE_DIR, "models", "encoders.pkl")
+    DELAY_ENCODER_PATH: str = os.path.join(BASE_DIR, "models", "delay_encoders.pkl")
 
 settings = Settings()

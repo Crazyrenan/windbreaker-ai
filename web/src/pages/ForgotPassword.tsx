@@ -72,7 +72,7 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f172a] text-slate-100 font-sans grid grid-cols-1 lg:grid-cols-2 overflow-hidden selection:bg-red-500 selection:text-white">
+    <div className="min-h-screen bg-app-bg text-slate-100 font-sans grid grid-cols-1 lg:grid-cols-2 overflow-hidden selection:bg-red-500 selection:text-white">
       
       <div ref={visualRef} className="relative hidden lg:flex flex-col justify-between p-12 bg-slate-900 overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1544256718-3b6102f1d24c?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-20 mix-blend-luminosity grayscale"></div>
@@ -102,7 +102,7 @@ const ForgotPassword = () => {
         </div>
       </div>
 
-      <div className="flex items-center justify-center p-6 bg-[#0f172a] relative">
+      <div className="flex items-center justify-center p-6 bg-app-bg relative">
         <div className="absolute top-1/2 right-0 -translate-y-1/2 w-96 h-96 bg-red-600/10 blur-[120px] rounded-full pointer-events-none"></div>
 
         <div ref={formRef} className="w-full max-w-md space-y-10 relative z-10">
@@ -171,7 +171,7 @@ const ForgotPassword = () => {
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-800"></div></div>
-            <div className="relative flex justify-center text-xs uppercase"><span className="bg-[#0f172a] px-4 text-slate-600 font-bold tracking-widest">System Status</span></div>
+            <div className="relative flex justify-center text-xs uppercase"><span className="bg-app-bg px-4 text-slate-600 font-bold tracking-widest">System Status</span></div>
           </div>
 
           <p className="text-center text-slate-600 text-sm">
