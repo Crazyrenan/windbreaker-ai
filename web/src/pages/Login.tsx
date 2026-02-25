@@ -84,12 +84,15 @@ const Login = () => {
         <div className="absolute top-0 left-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=2074&auto=format&fit=crop')] bg-cover bg-center opacity-20 mix-blend-luminosity"></div>
         <div className="absolute top-0 left-0 w-full h-full bg-linear-to-b from-slate-900/80 via-blue-900/20 to-slate-900/90"></div>
         
-        {/* Content */}
+        {/* MODIFIKASI DISINI: Logo sebagai Link ke Landing Page */}
         <div className="relative z-10">
-           <div className="text-xl font-black italic tracking-tighter flex items-center gap-2">
+          <Link 
+            to="/" 
+            className="text-xl font-black italic tracking-tighter flex items-center gap-2 hover:opacity-80 transition-opacity w-fit"
+          >
             <Plane className="text-blue-500" />
             WINDBREAKER<span className="text-blue-500">.AI</span>
-          </div>
+          </Link>
         </div>
 
         <div className="relative z-10 max-w-lg">
