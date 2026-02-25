@@ -2,137 +2,125 @@
   <img src="https://i.pinimg.com/1200x/ac/01/c2/ac01c256589eb1a052a73bd481bf32d9.jpg" alt="WINDBREAKER Header" width="100%"/>
 </p>
 
-<h1 align="center">✈️ WINDBREAKER.Ai</h1>
-<p align="center"><b>Enterprise-Grade Flight Delay Predictive Analytics</b></p>
+<h1 align="center">✈️ WINDBREAKER.AI</h1>
+<p align="center"><b>Enterprise-Grade Predictive Aviation Intelligence Platform</b></p>
+
+<p align="center">
+Machine Learning • Real-Time API • Production-Ready Architecture • Modern SaaS Interface
+</p>
 
 ---
 
-## 📌 Overview
+# 🧠 Executive Overview
 
-**WINDBREAKER.Ai** adalah solusi analitik prediktif modern yang dirancang untuk industri penerbangan.  
-Proyek ini mengintegrasikan model Machine Learning berperforma tinggi dengan arsitektur web production-ready untuk memprediksi keterlambatan penerbangan secara real-time berdasarkan data operasional.
+**WINDBREAKER.AI** is a full-stack predictive analytics platform engineered to forecast flight delays using high-performance machine learning models and a scalable web architecture.
 
----
+This project demonstrates the integration of:
 
-## 🌟 Key Features
+- Production-grade AI modeling
+- Asynchronous API architecture
+- Secure authentication flow
+- Modern SaaS frontend engineering
+- Real-time inference pipelines
 
-- 🚀 **High-Performance ML Model**  
-  Menggunakan algoritma **XGBoost (XGBClassifier)** yang dioptimalkan untuk klasifikasi status keterlambatan secara akurat.
-
-- ⚡ **Asynchronous API**  
-  Backend berbasis **FastAPI** dengan dukungan asynchronous request handling untuk efisiensi dan skalabilitas tinggi.
-
-- 🖥 **Interactive Dashboard**  
-  Antarmuka modern berbasis **React + TypeScript (Vite)** untuk input data dan visualisasi hasil prediksi.
-
-- 🔄 **Automated Data Transformation**  
-  Pemrosesan fitur kategorikal seperti `Origin` dan `Dest` menggunakan LabelEncoder secara konsisten antara training dan inference.
+Designed as a portfolio-level intelligent system, WINDBREAKER.AI reflects real-world engineering practices in AI product development.
 
 ---
 
-## 🛠 Tech Stack
+# 🚀 Core Capabilities
 
-### 🔹 AI & Backend
+## 🔮 Predictive Delay Modeling
+- XGBoost-based classification engine
+- Optimized for structured aviation datasets
+- Real-time probability output
+- Consistent preprocessing between training & inference
+
+## ⚡ High-Performance Backend
+- FastAPI (ASGI-based)
+- Asynchronous request handling
+- Structured modular architecture
+- Model loading via Joblib
+- Scalable deployment-ready design
+
+## 🖥 Modern SaaS Interface
+- React + TypeScript (Vite)
+- TailwindCSS utility-first styling
+- GSAP-powered motion system
+- Clean authentication UX flow
+- Dashboard-driven prediction UI
+
+## 🔐 Secure Access Control
+- Token-based authentication
+- OAuth2 form handling
+- Protected routes with role-based logic
+
+---
+
+# 🏗 System Architecture
+Frontend (React + TS)
+↓
+REST API (FastAPI)
+↓
+ML Inference Layer (XGBoost)
+↓
+Encoded Feature Pipeline
+
+
+The system ensures:
+
+- Deterministic preprocessing
+- Consistent label encoding
+- Efficient model loading
+- Minimal inference latency
+
+---
+
+# 🛠 Technology Stack
+
+## 🔹 AI & Backend
 - Python 3.10+
-- FastAPI (ASGI)
-- XGBoost
+- FastAPI
+- XGBoost (XGBClassifier)
 - Scikit-Learn
 - Pandas
-- Joblib / Pickle
+- Joblib
+- Uvicorn
 
-### 🔹 Frontend
-- React.js + TypeScript (Vite)
+## 🔹 Frontend
+- React 19
+- TypeScript
+- Vite
 - Tailwind CSS
+- GSAP (ScrollTrigger)
 - Axios
 
 ---
 
-## 🚀 Installation Guide
+# 📊 Machine Learning Methodology
 
-### 1️⃣ Backend Setup
+### 1️⃣ Feature Engineering
+Primary predictive features:
 
-```bash
-pip install pandas scikit-learn xgboost fastapi uvicorn joblib
-python api.py
-```
-
-API berjalan di:
-```
-http://localhost:8000
-```
-
-Dokumentasi tersedia di:
-```
-http://localhost:8000/docs
-```
-
----
-
-### 2️⃣ Frontend Setup
-
-```bash
-cd web
-npm install
-npm run dev
-```
-
-Frontend biasanya berjalan di:
-```
-http://localhost:5173
-```
-
----
-
-## 📊 Machine Learning Methodology
-
-### 1. Feature Selection
 - `DepTime`
 - `DepDelay`
 - `CRSArrTime`
 - `Origin`
 - `Dest`
 
-### 2. Categorical Encoding
-Menggunakan LabelEncoder yang konsisten antara tahap training dan inference.
+### 2️⃣ Encoding Strategy
+Categorical variables (`Origin`, `Dest`) are transformed using persistent LabelEncoder artifacts to ensure consistency during inference.
 
-### 3. Model Training
-Optimalisasi XGBoost untuk meminimalkan error pada target prediksi keterlambatan kedatangan (`ARR_DELAY`).
+### 3️⃣ Model Optimization
+- XGBoost hyperparameter tuning
+- Classification targeting arrival delay (`ARR_DELAY`)
+- Optimized for accuracy & inference speed
 
 ---
 
-## 📁 Project Structure
+# 📦 Installation & Setup
+
+## 🐍 Backend Setup
 
 ```bash
-WINDBREAKER.Ai/
-│
-├── api.py
-├── model/
-│   ├── xgb_model.pkl
-│   ├── encoder_origin.pkl
-│   └── encoder_dest.pkl
-│
-├── web/
-│   ├── src/
-│   └── package.json
-│
-└── README.md
-```
-
----
-
-## 📫 Contact
-
-**Jonathan Axl Wibowo**
-
-- 🌐 Portfolio: https://jonathanaxl.id  
-- 💼 LinkedIn: https://linkedin.com/in/jonathanaxl  
-- 📧 Email: jonathan.axlw@gmail.com  
-
----
-
-<p align="center">
-<i>Dikembangkan dengan fokus pada integritas data, skalabilitas sistem, dan pengalaman pengguna yang optimal.</i>
-</p>
-
-
-
+pip install pandas scikit-learn xgboost fastapi uvicorn joblib
+python api.py
